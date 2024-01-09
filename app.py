@@ -1,8 +1,21 @@
-from sqlalchemy import create_engine,text
-connection_string= "mysql+mysqlconnector://root:bunmi123@localhost/user"
-engine=create_engine(connection_string, echo=True)
-with engine.connect() as connection:
-    connection.execute(text("CREATE TABLE IF NOT EXIST biometrics(id INTEGER, name VARCHAR(50))"))
-    connection.execute(text("INSERT INTO biometrics (id, name) VALUES (:id, :name)"), {"id": 1, "name":"John"}) 
-    connection.execute(text("INSERT INTO biometrics (id, name) VALUES (:id, :name)"), [{"id": 2, "name":"Ben"},{"id":3, "name":"Paul"}])
-    connection.commit()
+from flask import Flask, render_template
+from sqlalchemy import create_engine
+from models.models import *
+
+app = Flask(__name__)
+app.secret_key = "secretkey"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root:bunmi123@localhost/sti_data"
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'], echo=True)
+
+Base.metadata.create_all(engine)
+
+@app.route('/')
+def index():
+    return 'Hello!! you`re Welcome'
+
+@app.route('/show_form')
+def show_form():
+    return render_template('forms.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
